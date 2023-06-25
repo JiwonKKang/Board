@@ -80,4 +80,22 @@ class JpaRepositoryTest {
         //then
         assertThat(articleRepository.findById(1L).orElseThrow()).hasFieldOrPropertyWithValue("hashtag", updateHashtag);
     }
+
+    @Test
+    @DisplayName("delete Test")
+    public void givenTestData_whenDeleting_thenWorkFine() throws Exception {
+
+        //given
+        Article article = articleRepository.findById(1L).orElseThrow();
+        long preArticleCount = articleRepository.count();
+        long preArticleCommentCount = articleCommentRepository.count();
+        int commentSize = article.getArticleComments().size();
+
+        //when
+        articleRepository.delete(article);
+
+        //then
+        assertThat(articleRepository.count()).isEqualTo(preArticleCount - 1);
+        assertThat(articleCommentRepository.count()).isEqualTo(preArticleCommentCount-commentSize);
+    }
 }
