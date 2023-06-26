@@ -19,7 +19,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Getter
-@ToString
+@ToString(callSuper = true)
 @Table(indexes = {
         @Index(columnList = "title"),
         @Index(columnList = "hashtag"),
@@ -43,6 +43,10 @@ public class Article extends AuditingFields{
     @Setter
     private String hashtag;
 
+    @ManyToOne(optional = false)
+    @Setter
+    private UserAccount userAccount;
+
     @ToString.Exclude
     @OrderBy("id")
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
@@ -50,14 +54,15 @@ public class Article extends AuditingFields{
 
     protected Article() {}
 
-    private Article(String title, String content, String hashtag) {
+    private Article(String title, String content, String hashtag, UserAccount userAccount) {
         this.title = title;
         this.content = content;
         this.hashtag = hashtag;
+        this.userAccount = userAccount;
     }
 
-    public static Article of(String title, String content, String hashtag) {
-        return new Article(title, content, hashtag);
+    public static Article of(String title, String content, String hashtag, UserAccount userAccount) {
+        return new Article(title, content, hashtag, userAccount);
     }
 
     @Override

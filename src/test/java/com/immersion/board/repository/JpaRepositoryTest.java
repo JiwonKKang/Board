@@ -2,6 +2,7 @@ package com.immersion.board.repository;
 
 import com.immersion.board.config.JpaConfig;
 import com.immersion.board.domain.Article;
+import com.immersion.board.domain.UserAccount;
 import lombok.RequiredArgsConstructor;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -24,12 +25,16 @@ class JpaRepositoryTest {
 
     private final ArticleRepository articleRepository;
     private final ArticleCommentRepository articleCommentRepository;
+    private final UserAccountRepository userAccountRepository;
 
 
     @Autowired
-    public JpaRepositoryTest(ArticleRepository articleRepository, ArticleCommentRepository articleCommentRepository) {
+    public JpaRepositoryTest(ArticleRepository articleRepository,
+                             ArticleCommentRepository articleCommentRepository,
+                             UserAccountRepository userAccountRepository) {
         this.articleRepository = articleRepository;
         this.articleCommentRepository = articleCommentRepository;
+        this.userAccountRepository = userAccountRepository;
     }
 
     @Test
@@ -53,10 +58,11 @@ class JpaRepositoryTest {
 
         //given
         long count = articleRepository.count();
+        UserAccount userAccount = userAccountRepository.save(UserAccount.of("uno", "pw", null, null, null));
 
 
         //when
-        Article savedArticle = articleRepository.save(Article.of("new aricle", "new content", "#spring"));
+        Article savedArticle = articleRepository.save(Article.of("new aricle", "new content", "#spring", userAccount));
 
         //then
         assertThat(articleRepository.count())
