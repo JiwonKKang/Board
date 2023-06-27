@@ -1,17 +1,30 @@
 package com.immersion.board.controller;
 
 import com.immersion.board.config.SecurityConfig;
+import com.immersion.board.dto.ArticleWithCommentsDto;
+import com.immersion.board.dto.UserAccountDto;
+import com.immersion.board.service.ArticleService;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.time.LocalDateTime;
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -24,18 +37,23 @@ class ArticleControllerTest {
     @Autowired
     private MockMvc mvc;
 
+    @MockBean
+    private ArticleService articleService;
+
     @Test
     @DisplayName("[view][GET] 게시글 리스트 (게시판) 페이지 - 정상호출")
     public void givenNothing_whenRequestingArticlesView_thenReturnsArticlesView() throws Exception {
 
         //given
-
+        given(articleService.searchArticles(eq(null), eq(null), any(Pageable.class))).willReturn(Page.empty());
+        //field 하나만 argumentMatcher(any())일수 없기 떄문에 다른 argument 들도 eq()를 사용했다
         //when&then
         mvc.perform(get("/articles"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("articles/index"))
                 .andExpect(model().attributeExists("articles"));
+        then(articleService).should().searchArticles(eq(null), eq(null), any(Pageable.class));
 
     }
 
@@ -44,6 +62,8 @@ class ArticleControllerTest {
     public void givenNothing_whenRequestingArticleView_thenReturnsArticleView() throws Exception {
 
         //given
+        Long articleId = 1L;
+        given(articleService.getArticle(articleId)).willReturn(createArticleWithCommentsDto());
 
         //when&then
         mvc.perform(get("/articles/1"))
@@ -53,6 +73,7 @@ class ArticleControllerTest {
                 .andExpect(model().attributeExists("article"))
                 .andExpect(model().attributeExists("articleComments"));
 
+        then(articleService).should().getArticle(articleId);
     }
 
     @Test
@@ -83,5 +104,34 @@ class ArticleControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(model().attributeExists("articles"));
 
+    }
+
+    private ArticleWithCommentsDto createArticleWithCommentsDto() {
+        return ArticleWithCommentsDto.of(
+                1L,
+                createUserAccountDto(),
+                Set.of(),
+                "title",
+                "content",
+                "#java",
+                LocalDateTime.now(),
+                "uno",
+                LocalDateTime.now(),
+                "uno"
+        );
+    }
+
+    private UserAccountDto createUserAccountDto() {
+        return UserAccountDto.of(1L,
+                "uno",
+                "pw",
+                "uno@mail.com",
+                "Uno",
+                "memo",
+                LocalDateTime.now(),
+                "uno",
+                LocalDateTime.now(),
+                "uno"
+        );
     }
 }
