@@ -5,6 +5,7 @@ import com.immersion.board.dto.ArticleWithCommentsDto;
 import com.immersion.board.response.ArticleResponse;
 import com.immersion.board.response.ArticleWithCommentResponse;
 import com.immersion.board.service.ArticleService;
+import com.immersion.board.service.PaginationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,12 +18,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/articles")
 @RequiredArgsConstructor
 public class ArticleController {
 
     private final ArticleService articleService;
+    private final PaginationService paginationService;
 
     @GetMapping
     public String articles(
@@ -32,8 +36,10 @@ public class ArticleController {
             ModelMap map) {
 
         Page<ArticleResponse>  res = articleService.searchArticles(searchType, searchKeyword, pageable).map(ArticleResponse::from);
+        List<Integer> paginationBarNumbers = paginationService.getPaginationBarNumbers(pageable.getPageNumber(), res.getTotalPages());
 
         map.addAttribute("articles", res);
+        map.addAttribute("paginationBarNumbers", paginationBarNumbers);
         return "articles/index";
     }
 
