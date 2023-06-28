@@ -2,6 +2,7 @@ package com.immersion.board.dto;
 
 import com.immersion.board.domain.Article;
 import com.immersion.board.domain.ArticleComment;
+import com.immersion.board.domain.UserAccount;
 
 import java.time.LocalDateTime;
 
@@ -20,6 +21,10 @@ public record ArticleCommentDto(
         return new ArticleCommentDto(id, articleId, userAccountDto, content, createdAt, createdBy, modifiedAt, modifiedBy);
     }
 
+    public static ArticleCommentDto of(Long articleId, UserAccountDto userAccountDto, String content) {
+        return new ArticleCommentDto(null, articleId, userAccountDto, content, null, null, null, null);
+    }
+
     public static ArticleCommentDto from(ArticleComment entity) {
         return new ArticleCommentDto(
                 entity.getId(),
@@ -33,11 +38,11 @@ public record ArticleCommentDto(
         );
     }
 
-    public ArticleComment toEntity(Article entity) {
+    public ArticleComment toEntity(Article article, UserAccount userAccount) {
         return ArticleComment.of(
-                entity,
+                article,
                 content,
-                userAccountDto.toEntity()
+                userAccount
         );
     }
 }

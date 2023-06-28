@@ -1,4 +1,4 @@
-package com.immersion.board.domain.type;
+package com.immersion.board.domain.constant;
 
 import lombok.Getter;
 
