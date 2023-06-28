@@ -44,6 +44,7 @@ public class Article extends AuditingFields{
     private String hashtag;
 
     @ManyToOne(optional = false)
+    @JoinColumn(name = "user_id")
     @Setter
     private UserAccount userAccount;
 
