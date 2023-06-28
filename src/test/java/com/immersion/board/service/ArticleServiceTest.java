@@ -4,7 +4,6 @@ import com.immersion.board.domain.Article;
 import com.immersion.board.domain.UserAccount;
 import com.immersion.board.domain.type.SearchType;
 import com.immersion.board.dto.ArticleDto;
-import com.immersion.board.dto.ArticleUpdateDto;
 import com.immersion.board.dto.ArticleWithCommentsDto;
 import com.immersion.board.dto.UserAccountDto;
 import com.immersion.board.repository.ArticleRepository;
