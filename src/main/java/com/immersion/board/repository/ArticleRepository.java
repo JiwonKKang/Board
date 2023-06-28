@@ -2,6 +2,7 @@ package com.immersion.board.repository;
 
 import com.immersion.board.domain.Article;
 import com.immersion.board.domain.QArticle;
+import com.immersion.board.repository.querydsl.ArticleRepositoryCustom;
 import com.querydsl.core.types.dsl.DateTimeExpression;
 import com.querydsl.core.types.dsl.StringExpression;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 @RepositoryRestResource
 public interface ArticleRepository extends
         JpaRepository<Article, Long>,
+        ArticleRepositoryCustom,
         QuerydslPredicateExecutor<Article>,
         QuerydslBinderCustomizer<QArticle> {
 
