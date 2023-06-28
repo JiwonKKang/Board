@@ -1,5 +1,17 @@
 package com.immersion.board.domain.type;
 
+import lombok.Getter;
+
 public enum SearchType {
-    TITLE, ID, NICKNAME, HASHTAG, CONTENT
+    TITLE("제목"),
+    ID("유저ID"),
+    NICKNAME("닉네임"),
+    HASHTAG("해시태그"),
+    CONTENT("내용");
+
+    @Getter private final String description;
+
+    SearchType(String description) {
+        this.description = description;
+    }
 }

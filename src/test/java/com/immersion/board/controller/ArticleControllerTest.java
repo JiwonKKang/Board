@@ -1,6 +1,7 @@
 package com.immersion.board.controller;
 
 import com.immersion.board.config.SecurityConfig;
+import com.immersion.board.domain.type.SearchType;
 import com.immersion.board.dto.ArticleWithCommentsDto;
 import com.immersion.board.dto.UserAccountDto;
 import com.immersion.board.service.ArticleService;
@@ -63,6 +64,28 @@ class ArticleControllerTest {
                 .andExpect(model().attributeExists("paginationBarNumbers"));
         then(articleService).should().searchArticles(eq(null), eq(null), any(Pageable.class));
         then(paginationService).should().getPaginationBarNumbers(anyInt(), anyInt());
+    }
+
+    @Test
+    @DisplayName("[view][GET] 게시글 리스트 (게시판) 페이지 - 검색")
+    public void givenSearchKeyword_whenSearchingArticlesView_thenReturnsArticlesView() throws Exception {
+
+        //given
+        SearchType searchType = SearchType.TITLE;
+        String searchValue = "title";
+        given(articleService.searchArticles(eq(searchType), eq(searchValue), any(Pageable.class))).willReturn(Page.empty());
+        //field 하나만 argumentMatcher(any())일수 없기 떄문에 다른 argument 들도 eq()를 사용했다
+        //when&then
+        mvc.perform(get("/articles")
+                        .queryParam("searchType", searchType.name())
+                        .queryParam("searchValue", searchValue)
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+                .andExpect(view().name("articles/index"))
+                .andExpect(model().attributeExists("articles"))
+                .andExpect(model().attributeExists("searchTypes"));
+        then(articleService).should().searchArticles(eq(searchType), eq(searchValue), any(Pageable.class));
     }
 
     @DisplayName("[view][GET] 게시글 리스트 (게시판) 페이지 - 페이징, 정렬 기능")
