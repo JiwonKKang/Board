@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 
 import java.util.List;
 
+import static com.immersion.board.domain.QArticle.*;
+
 public class ArticleRepositoryCustomImpl extends QuerydslRepositorySupport implements ArticleRepositoryCustom {
 
     public ArticleRepositoryCustomImpl() {
@@ -16,8 +18,6 @@ public class ArticleRepositoryCustomImpl extends QuerydslRepositorySupport imple
 
     @Override
     public List<String> findAllDistinctHashtags() {
-
-        QArticle article = QArticle.article;
 
         return from(article)
                 .distinct()

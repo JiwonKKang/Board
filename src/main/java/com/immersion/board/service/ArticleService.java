@@ -71,7 +71,7 @@ public class ArticleService {
         }
     }
 
-    public void deleteArticle(long articleId) {
+    public void deleteArticle(long articleId, String userId) {
         articleRepository.deleteById(articleId);
     }
 
