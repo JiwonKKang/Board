@@ -52,10 +52,9 @@ public class ArticleCommentService {
         } catch (EntityNotFoundException e) {
             log.warn("수정하려는 댓글을 찾을 수 없습니다.");
         }
-
     }
 
-    public void deleteArticleComment(Long articleCommentId) {
-        articleCommentRepository.deleteById(articleCommentId);
+    public void deleteArticleComment(Long articleCommentId, String userId) {
+        articleCommentRepository.deleteByIdAndUserAccount_UserId(articleCommentId, userId);
     }
 }
