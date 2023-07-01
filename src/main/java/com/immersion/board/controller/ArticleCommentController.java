@@ -1,9 +1,7 @@
 package com.immersion.board.controller;
 
-import com.immersion.board.dto.UserAccountDto;
 import com.immersion.board.dto.request.ArticleCommentRequest;
 import com.immersion.board.dto.security.BoardPrincipal;
-import com.immersion.board.repository.ArticleCommentRepository;
 import com.immersion.board.service.ArticleCommentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
