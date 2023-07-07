@@ -1,13 +1,12 @@
 package com.immersion.board.controller;
 
-import com.immersion.board.config.SecurityConfig;
 import com.immersion.board.domain.constant.FormStatus;
 import com.immersion.board.domain.constant.SearchType;
 import com.immersion.board.dto.ArticleDto;
 import com.immersion.board.dto.ArticleWithCommentsDto;
 import com.immersion.board.dto.UserAccountDto;
 import com.immersion.board.dto.request.ArticleRequest;
-import com.immersion.board.response.ArticleResponse;
+import com.immersion.board.dto.response.ArticleResponse;
 import com.immersion.board.service.ArticleService;
 import com.immersion.board.service.PaginationService;
 import com.immersion.board.testconfig.TestSecurityConfig;

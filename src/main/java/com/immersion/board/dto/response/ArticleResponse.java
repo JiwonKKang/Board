@@ -1,4 +1,4 @@
-package com.immersion.board.response;
+package com.immersion.board.dto.response;
 
 import com.immersion.board.dto.ArticleDto;
 
