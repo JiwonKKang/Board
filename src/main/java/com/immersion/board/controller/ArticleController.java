@@ -2,14 +2,14 @@ package com.immersion.board.controller;
 
 import com.immersion.board.domain.constant.FormStatus;
 import com.immersion.board.domain.constant.SearchType;
-import com.immersion.board.dto.UserAccountDto;
 import com.immersion.board.dto.request.ArticleRequest;
 import com.immersion.board.dto.security.BoardPrincipal;
-import com.immersion.board.response.ArticleResponse;
-import com.immersion.board.response.ArticleWithCommentsResponse;
+import com.immersion.board.dto.response.ArticleResponse;
+import com.immersion.board.dto.response.ArticleWithCommentsResponse;
 import com.immersion.board.service.ArticleService;
 import com.immersion.board.service.PaginationService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/articles")
 @Controller
@@ -102,7 +103,6 @@ public class ArticleController {
     @PostMapping("/{articleId}/form")
     public String updateArticle(@PathVariable Long articleId, ArticleRequest articleRequest,
                                 @AuthenticationPrincipal BoardPrincipal boardPrincipal) {
-
         articleService.updateArticle(articleId, articleRequest.toDto(boardPrincipal.toDto()));
         return "redirect:/articles/" + articleId;
     }

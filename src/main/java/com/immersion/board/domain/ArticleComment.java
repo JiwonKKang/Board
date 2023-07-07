@@ -1,5 +1,6 @@
 package com.immersion.board.domain;
 
+import com.immersion.board.dto.ArticleCommentDto;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -10,7 +11,9 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -36,19 +39,34 @@ public class ArticleComment extends AuditingFields{
     private UserAccount userAccount;
 
     @Setter
+    @Column(updatable = false)
+    private Long parentCommentId;
+
+    @ToString.Exclude
+    @OrderBy("createdAt ASC")
+    @OneToMany(mappedBy = "parentCommentId", cascade = CascadeType.ALL)
+    private Set<ArticleComment> childComments = new LinkedHashSet<>();
+
+    @Setter
     @Column(nullable = false, length = 500)
     private String content;
 
     protected ArticleComment() {}
 
-    private ArticleComment(Article article, String content, UserAccount userAccount) {
+    private ArticleComment(Article article, String content, Long parentCommentId, UserAccount userAccount) {
         this.article = article;
-        this.content = content;
         this.userAccount = userAccount;
+        this.parentCommentId = parentCommentId;
+        this.content = content;
     }
 
     public static ArticleComment of(Article article, String content, UserAccount userAccount) {
-        return new ArticleComment(article, content, userAccount);
+        return new ArticleComment(article, content, null, userAccount);
+    }
+
+    public void addChildComment(ArticleComment articleComment) {
+        this.getChildComments().add(articleComment);
+        articleComment.setParentCommentId(this.getId());
     }
 
     @Override
