@@ -1,19 +1,10 @@
 package com.immersion.board.domain;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.core.annotation.Order;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -40,8 +31,14 @@ public class Article extends AuditingFields{
     @Column(nullable = false, length = 10000)
     private String content;
 
-    @Setter
-    private String hashtag;
+    @ToString.Exclude
+    @JoinTable(
+            name = "article_hashtag",
+            joinColumns = @JoinColumn(name = "article_id"),
+            inverseJoinColumns = @JoinColumn(name = "hashtag_id")
+    )
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private Set<Hashtag> hashtags = new LinkedHashSet<>();
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id")
@@ -55,15 +52,14 @@ public class Article extends AuditingFields{
 
     protected Article() {}
 
-    private Article(String title, String content, String hashtag, UserAccount userAccount) {
+    private Article(String title, String content, UserAccount userAccount) {
         this.title = title;
         this.content = content;
-        this.hashtag = hashtag;
         this.userAccount = userAccount;
     }
 
-    public static Article of(String title, String content, String hashtag, UserAccount userAccount) {
-        return new Article(title, content, hashtag, userAccount);
+    public static Article of(String title, String content, UserAccount userAccount) {
+        return new Article(title, content, userAccount);
     }
 
     @Override
