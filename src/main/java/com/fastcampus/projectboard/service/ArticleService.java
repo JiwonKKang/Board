@@ -18,11 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -31,9 +29,9 @@ import java.util.stream.Stream;
 public class ArticleService {
 
     private final HashtagService hashtagService;
-    private final HashtagRepository hashtagRepository;
     private final ArticleRepository articleRepository;
     private final UserAccountRepository userAccountRepository;
+    private final HashtagRepository hashtagRepository;
 
     @Transactional(readOnly = true)
     public Page<ArticleDto> searchArticles(SearchType searchType, String searchKeyword, Pageable pageable) {
@@ -47,7 +45,7 @@ public class ArticleService {
             case ID -> articleRepository.findByUserAccount_UserIdContaining(searchKeyword, pageable).map(ArticleDto::from);
             case NICKNAME -> articleRepository.findByUserAccount_NicknameContaining(searchKeyword, pageable).map(ArticleDto::from);
             case HASHTAG -> articleRepository.findByHashtagNames(
-                    Arrays.stream(searchKeyword.split(",")).toList(),
+                    Arrays.stream(searchKeyword.split(" ")).toList(),
                     pageable
                 )
                     .map(ArticleDto::from);
@@ -86,29 +84,28 @@ public class ArticleService {
                 if (dto.title() != null) { article.setTitle(dto.title()); }
                 if (dto.content() != null) { article.setContent(dto.content()); }
 
-                Set<Long> hashtagIds = article.getHashtags()
-                        .stream()
+                Set<Long> hashtagIds = article.getHashtags().stream()
                         .map(Hashtag::getId)
-
                         .collect(Collectors.toUnmodifiableSet());
                 article.clearHashtags();
                 articleRepository.flush();
 
                 hashtagIds.forEach(hashtagService::deleteHashtagWithoutArticles);
-                article.addHashtags(renewHashtagsFromContent(dto.content()));
+
+                Set<Hashtag> hashtags = renewHashtagsFromContent(dto.content());
+                article.addHashtags(hashtags);
             }
         } catch (EntityNotFoundException e) {
             log.warn("게시글 업데이트 실패. 게시글을 수정하는데 필요한 정보를 찾을 수 없습니다 - {}", e.getLocalizedMessage());
         }
-
-
     }
 
     public void deleteArticle(long articleId, String userId) {
         Article article = articleRepository.getReferenceById(articleId);
-        Set<Long> hashtagIds = article.getHashtags()
-                .stream().map(Hashtag::getId)
+        Set<Long> hashtagIds = article.getHashtags().stream()
+                .map(Hashtag::getId)
                 .collect(Collectors.toUnmodifiableSet());
+
         articleRepository.deleteByIdAndUserAccount_UserId(articleId, userId);
         articleRepository.flush();
 
@@ -130,21 +127,24 @@ public class ArticleService {
     }
 
     public List<String> getHashtags() {
-        return hashtagRepository.findAllHashtagNames(); //TODO: HashtagService 로 이동을 고려해보자
+        return hashtagRepository.findAllHashtagNames(); // TODO: HashtagService 로 이동을 고려해보자.
     }
 
 
     private Set<Hashtag> renewHashtagsFromContent(String content) {
-        Set<String> parseHashtags = hashtagService.parseHashtagNames(content);
-        Set<Hashtag> hashtags = hashtagService.findHashtagsByNames(parseHashtags);
-        Set<String> exitsHashtags = hashtags.stream().map(Hashtag::getHashtagName).collect(Collectors.toUnmodifiableSet());
+        Set<String> hashtagNamesInContent = hashtagService.parseHashtagNames(content);
+        Set<Hashtag> hashtags = hashtagService.findHashtagsByNames(hashtagNamesInContent);
+        Set<String> existingHashtagNames = hashtags.stream()
+                .map(Hashtag::getHashtagName)
+                .collect(Collectors.toUnmodifiableSet());
 
-        parseHashtags.forEach(newHashtagName -> {
-            if (!exitsHashtags.contains(newHashtagName)) {
+        hashtagNamesInContent.forEach(newHashtagName -> {
+            if (!existingHashtagNames.contains(newHashtagName)) {
                 hashtags.add(Hashtag.of(newHashtagName));
             }
         });
 
         return hashtags;
     }
+
 }
