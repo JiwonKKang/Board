@@ -3,6 +3,7 @@ package com.fastcampus.projectboard.domain;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.catalina.User;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -40,7 +41,7 @@ public class UserAccount extends AuditingFields {
     }
 
     public static UserAccount of(String userId, String userPassword, String email, String nickname, String memo) {
-        return new UserAccount(userId, userPassword, email, nickname, memo,null);
+        return UserAccount.of(userId, userPassword, email, nickname, memo,null);
     }
 
     public static UserAccount of(String userId, String userPassword, String email, String nickname, String memo, String createdBy) {
