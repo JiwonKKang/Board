@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RequiredArgsConstructor
-@RequestMapping("/articles")
+@RequestMapping("/articles")//
 @Controller
 public class ArticleController {
 
