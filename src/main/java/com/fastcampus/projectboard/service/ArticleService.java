@@ -132,13 +132,14 @@ public class ArticleService {
 
 
     private Set<Hashtag> renewHashtagsFromContent(String content) {
-        Set<String> hashtagNamesInContent = hashtagService.parseHashtagNames(content);
-        Set<Hashtag> hashtags = hashtagService.findHashtagsByNames(hashtagNamesInContent);
-        Set<String> existingHashtagNames = hashtags.stream()
+        Set<String> hashtagNamesInContent = hashtagService.parseHashtagNames(content); //본문에서 해시태그 추출
+        Set<Hashtag> hashtags = hashtagService.findHashtagsByNames(hashtagNamesInContent); // DB에 이미 있는 해시태그 조회
+        Set<String> existingHashtagNames = hashtags.stream()//이미있는 해시태그들을 String 으로 변환
                 .map(Hashtag::getHashtagName)
                 .collect(Collectors.toUnmodifiableSet());
 
-        hashtagNamesInContent.forEach(newHashtagName -> {
+        hashtagNamesInContent.forEach(newHashtagName -> { /*본문에서 찾은 해시태그들중 DB에 없는
+                                                        새로운 해시태그들을 찾아서 기존에있던 해시태그 Set 에 add*/
             if (!existingHashtagNames.contains(newHashtagName)) {
                 hashtags.add(Hashtag.of(newHashtagName));
             }
