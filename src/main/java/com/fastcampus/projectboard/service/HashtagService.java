@@ -45,5 +45,4 @@ public class HashtagService {
             hashtagRepository.delete(hashtag);
         }
     }
-
 }
